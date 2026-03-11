@@ -6,7 +6,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // TEMP: send to an email you can check easily (e.g. Gmail)
 const TO_EMAIL = "permitpath@icloud.com";
 // Use Resend's default verified sender for now
-const FROM_EMAIL = "Acme <onboarding@resend.dev>";
+const FROM_EMAIL = "PermitPath Contact <noreply@mail.permitpathnav.com>";
 
 // TEMP: allow all origins while testing
 const ALLOWED_ORIGIN = "*";
