@@ -3,12 +3,13 @@ const { Resend } = require("resend");
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// TEMP: send to an email you can check easily (e.g. Gmail)
 const TO_EMAIL = "support@permitpathnav.com";
-// for now use Resend's default verified sender
+// Use Resend's default verified sender for now
 const FROM_EMAIL = "Acme <onboarding@resend.dev>";
 
-// Adjust this to your real site in production
-const ALLOWED_ORIGIN = "https://permitpathnav.com";
+// TEMP: allow all origins while testing
+const ALLOWED_ORIGIN = "*";
 
 function setCors(res) {
   res.setHeader("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
@@ -21,39 +22,38 @@ function setCors(res) {
 }
 
 module.exports = async (req, res) => {
-  // Handle CORS preflight
-  if (req.method === "OPTIONS") {
-    setCors(res);
-    return res.status(200).end();
-  }
-
-  setCors(res);
-
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
-  const { name, email, message } = req.body || {};
-
-  if (!name || !email || !message) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
-
   try {
-  console.log("Calling Resend with:", { name, email, message });
+    // CORS preflight
+    if (req.method === "OPTIONS") {
+      setCors(res);
+      return res.status(200).end();
+    }
 
-  const result = await resend.emails.send({
-    from: FROM_EMAIL,
-    to: TO_EMAIL,
-    reply_to: email,
-    subject: `New contact from ${name}`,
-    text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
-  });
+    setCors(res);
 
-  console.log("Resend result:", result);
+    if (req.method !== "POST") {
+      return res.status(405).json({ error: "Method not allowed" });
+    }
 
-  return res.status(200).json({ success: true });
-} catch (error) {
-  console.error("Resend error:", error);
-  return res.status(500).json({ error: "Failed to send email" });
-}
+    const { name, email, message } = req.body || {};
+
+    if (!name || !email || !message) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    const result = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: TO_EMAIL,
+      reply_to: email,
+      subject: `New contact from ${name}`,
+      text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+    });
+
+    console.log("Resend result:", result);
+
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("Resend error:", error);
+    return res.status(500).json({ error: "Failed to send email" });
+  }
+};
