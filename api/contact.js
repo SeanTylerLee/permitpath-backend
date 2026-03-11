@@ -40,17 +40,20 @@ module.exports = async (req, res) => {
   }
 
   try {
-    await resend.emails.send({
-      from: FROM_EMAIL,
-      to: TO_EMAIL,
-      reply_to: email,
-      subject: `New contact from ${name}`,
-      text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
-    });
+  console.log("Calling Resend with:", { name, email, message });
 
-    return res.status(200).json({ success: true });
-  } catch (error) {
-    console.error("Resend error:", error);
-    return res.status(500).json({ error: "Failed to send email" });
-  }
-};
+  const result = await resend.emails.send({
+    from: FROM_EMAIL,
+    to: TO_EMAIL,
+    reply_to: email,
+    subject: `New contact from ${name}`,
+    text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+  });
+
+  console.log("Resend result:", result);
+
+  return res.status(200).json({ success: true });
+} catch (error) {
+  console.error("Resend error:", error);
+  return res.status(500).json({ error: "Failed to send email" });
+}
